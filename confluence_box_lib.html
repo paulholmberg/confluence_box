@@ -1,4 +1,5 @@
-function add_box_link_as(el_type, box_file_link) {
+<script>
+  function add_box_link_as(el_type, box_file_link) {
   parent_el = document.currentScript.parentNode
   box_token = JSON.parse(window.localStorage[Object.keys(window.localStorage).filter(x=>x.includes('box.token'))]).value
   console.log(box_token)
@@ -17,3 +18,4 @@ function add_box_link_as(el_type, box_file_link) {
     el.load()
   })
 }
+</script>
