@@ -1,14 +1,24 @@
 <script>
-  function add_box_link_as(el_type, box_file_link) {
+  function add_box_link_as(el_type, box_file_link, box_token) {
   parent_el = document.currentScript.parentNode
-  box_token = JSON.parse(window.localStorage[Object.keys(window.localStorage).filter(x=>x.includes('box.token'))]).value
-  console.log(box_token)
-  fetch('https://api.box.com/2.0/shared_items', {
+  if (box_token == undefined) {
+    box_token = JSON.parse(window.localStorage[Object.keys(window.localStorage).filter(x=>x.includes('box.token'))]).value
+  }
+  p = fetch('https://api.box.com/2.0/shared_items', {
       headers: {
         Authorization: 'Bearer ' + box_token,
         BoxApi:    'shared_link=' + box_file_link
       }
-  }).then(resp => resp.json()).then(function (json) {
+  })
+  .then(function (resp) {
+    if (resp.ok) {
+      return resp.json()
+    }
+    else {
+      console.log(resp.status)
+    }
+  })
+  .then(function (json) {
     el = document.createElement('br')
     parent_el.appendChild(el)
     el = document.createElement(el_type)
@@ -17,5 +27,15 @@
     el.src = 'https://api.box.com/2.0/files/' + json.id + '/content?access_token=' + box_token
     el.load()
   })
+  .catch(function (error) {
+    if (error.stack.includes('TypeError')) {
+      console.log('foo')
+      el = document.createElement('br')
+      parent_el.appendChild(el)
+      el = document.createElement('p')
+      el.innerHTML = 'Failed to fetch ' + el_type + ' from Box. You will need to authenticate first'
+      parent_el.appendChild(el)
+    }
+   })
 }
 </script>
